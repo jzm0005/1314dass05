@@ -27,6 +27,7 @@ import junit.extensions.*;
 import java.lang.AssertionError;
 import java.io.*;
 
+
 public class LANTests extends TestCase {
 
 	public static Test suite() {
