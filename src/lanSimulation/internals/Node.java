@@ -86,4 +86,8 @@ Construct a <em>Node</em> with given #type and #name, and which is linked to #ne
 		report.flush();
 	}
 
+	public Node atDestination(Network network) {
+		return nextNode_;
+	}
+
 }
