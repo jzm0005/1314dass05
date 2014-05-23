@@ -27,7 +27,6 @@ import junit.extensions.*;
 import java.lang.AssertionError;
 import java.io.*;
 
-
 public class LANTests extends TestCase {
 
 	public static Test suite() {
@@ -142,8 +141,8 @@ public class LANTests extends TestCase {
         Node node;
 
     	node = new Node(Node.NODE, "n");
-        assertEquals("type_",
-            node.type_, Node.NODE);
+    	assertEquals("type_",
+                node.type_, Node.NODE);
         assertEquals("name_",
             node.name_, "n");
         assertEquals("nextNode_",
@@ -248,10 +247,16 @@ the tests should work as expected.
             }*/
 
 	public void test() {
+		
 	    Network network = Network.DefaultExample();
 	    StringWriter report = new StringWriter(100);
-	    network.requestWorkstationPrintsDocument("UnknownWorkstation",
-					      "does not matter", "does not matter", report);
+	    try{
+	    	network.requestWorkstationPrintsDocument("UnknownWorkstation",
+	    			"does not matter", "does not matter", report);
+	    	fail();
+		}catch(AssertionError e){
+			
+		}
 	}
 
   
