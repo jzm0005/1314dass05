@@ -20,6 +20,7 @@
 package lanSimulation;
 
 import lanSimulation.internals.*;
+
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.io.*;
@@ -163,6 +164,8 @@ which should be treated by all nodes.
 	public boolean requestBroadcast(Writer report) {
 		assert consistentNetwork();
 
+		String string = "' passes packet on.\n";
+		String string2 = "' accepts broadcase packet.\n";
 		try {
 			report.write("Broadcast Request\n");
 		} catch (IOException exc) {
@@ -173,13 +176,8 @@ which should be treated by all nodes.
 		Packet packet = new Packet("BROADCAST", firstNode_.name_, firstNode_.name_);
 		do {
 			try {
-				report.write("\tNode '");
-				report.write(currentNode.name_);
-				report.write("' accepts broadcase packet.\n");
-				report.write("\tNode '");
-				report.write(currentNode.name_);
-				report.write("' passes packet on.\n");
-				report.flush();
+				logging(report, currentNode, string2);
+				logging(report, currentNode, string);
 			} catch (IOException exc) {
 				// just ignore
 			};
@@ -209,6 +207,8 @@ Therefore #receiver sends a packet across the token ring network, until either
 			String printer, Writer report) {
 		assert consistentNetwork() & hasWorkstation(workstation);
 
+		String string = "' passes packet on.\n";
+		
 		try {
 			report.write("'");
 			report.write(workstation);
@@ -228,10 +228,7 @@ Therefore #receiver sends a packet across the token ring network, until either
 		startNode = (Node) workstations_.get(workstation);
 
 		try {
-			report.write("\tNode '");
-			report.write(startNode.name_);
-			report.write("' passes packet on.\n");
-			report.flush();
+			logging(report, startNode, string);
 		} catch (IOException exc) {
 			// just ignore
 		};
@@ -239,10 +236,7 @@ Therefore #receiver sends a packet across the token ring network, until either
 		while ((! packet.destination_.equals(currentNode.name_))
 				& (! packet.origin_.equals(currentNode.name_))) {
 			try {
-				report.write("\tNode '");
-				report.write(currentNode.name_);
-				report.write("' passes packet on.\n");
-				report.flush();
+				logging(report, currentNode, string);
 			} catch (IOException exc) {
 				// just ignore
 			};
@@ -264,10 +258,19 @@ Therefore #receiver sends a packet across the token ring network, until either
 		return result;
 	}
 
+	private void logging(Writer report, Node node, String string) throws IOException {
+		report.write("\tNode '");
+		report.write(node.name_);
+		report.write(string);
+		report.flush();
+	}
+
 	private boolean printDocument (Node printer, Packet document, Writer report) {
 		String author = "Unknown";
 		String title = "Untitled";
 		int startPos = 0, endPos = 0;
+		String string1 = ">>> Postscript job delivered.\n\n";
+		String string2 = ">>> ASCII Print job delivered.\n\n";
 
 		if (printer.type_ == Node.PRINTER) {
 			try {
@@ -282,28 +285,17 @@ Therefore #receiver sends a packet across the token ring network, until either
 							endPos = document.message_.indexOf(".", startPos + 6);
 							if (endPos < 0) {endPos = document.message_.length();};
 							title = document.message_.substring(startPos + 6, endPos);};
-							report.write("\tAccounting -- author = '");
-							report.write(author);
-							report.write("' -- title = '");
-							report.write(title);
-							report.write("'\n");
-							report.write(">>> Postscript job delivered.\n\n");
-							report.flush();
+							accounting(report, author, title, string1);
 				} else {
 					title = "ASCII DOCUMENT";
 					if (document.message_.length() >= 16) {
 						author = document.message_.substring(8, 16);};
-						report.write("\tAccounting -- author = '");
-						report.write(author);
-						report.write("' -- title = '");
-						report.write(title);
-						report.write("'\n");
-						report.write(">>> ASCII Print job delivered.\n\n");
-						report.flush();
+						accounting(report, author, title, string2);
 				};
 			} catch (IOException exc) {
 				// just ignore
 			};
+		
 			return true;
 		} else {
 			try {
@@ -314,6 +306,17 @@ Therefore #receiver sends a packet across the token ring network, until either
 			};
 			return false;
 		}
+	}
+
+	private void accounting(Writer report, String author, String title, String string)
+			throws IOException {
+		report.write("\tAccounting -- author = '");
+		report.write(author);
+		report.write("' -- title = '");
+		report.write(title);
+		report.write("'\n");
+		report.write(string);
+		report.flush();
 	}
 
 	/**
