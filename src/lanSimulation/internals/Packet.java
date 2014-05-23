@@ -65,8 +65,8 @@ Construct a <em>Packet</em> with given #message, #origin and #receiver.
 		int startPos = 0, endPos = 0;
 		String string1 = ">>> Postscript job delivered.\n\n";
 		String string2 = ">>> ASCII Print job delivered.\n\n";
-	
-		if (printer.type_ == Node.PRINTER) {
+
+		if (printer.getType_() == Node.PRINTER) {
 			try {
 				if (message_.startsWith("!PS")) {
 					startPos = message_.indexOf("author:");
@@ -89,7 +89,7 @@ Construct a <em>Packet</em> with given #message, #origin and #receiver.
 			} catch (IOException exc) {
 				// just ignore
 			};
-		
+
 			return true;
 		} else {
 			try {

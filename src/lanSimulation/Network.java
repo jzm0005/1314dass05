@@ -110,7 +110,7 @@ Answer whether #receiver contains a workstation with the given name.
 		if (n == null) {
 			return false;
 		} else {
-			return n.type_ == Node.WORKSTATION;
+			return n.getType_() == Node.WORKSTATION;
 		}
 	};
 
@@ -136,15 +136,15 @@ A consistent token ring network
 		iter = workstations_.elements();
 		while (iter.hasMoreElements()) {
 			currentNode = (Node) iter.nextElement();
-			if (currentNode.type_ != Node.WORKSTATION) {return false;};
+			if (currentNode.getType_() != Node.WORKSTATION) {return false;};
 		};
 		//enumerate the token ring, verifying whether all workstations are registered
 		//also count the number of printers and see whether the ring is circular
 		currentNode = firstNode_;
 		while (! encountered.containsKey(currentNode.name_)) {
 			encountered.put(currentNode.name_, currentNode);
-			if (currentNode.type_ == Node.WORKSTATION) {workstationsFound++;};
-			if (currentNode.type_ == Node.PRINTER) {printersFound++;};
+			if (currentNode.getType_() == Node.WORKSTATION) {workstationsFound++;};
+			if (currentNode.getType_() == Node.PRINTER) {printersFound++;};
 			currentNode = currentNode.atDestination(this);
 		};
 		if (currentNode != firstNode_) {return false;};//not circular
@@ -208,7 +208,7 @@ Therefore #receiver sends a packet across the token ring network, until either
 		assert consistentNetwork() & hasWorkstation(workstation);
 
 		String string = "' passes packet on.\n";
-		
+
 		try {
 			report.write("'");
 			report.write(workstation);
@@ -288,26 +288,7 @@ Write a printable representation of #receiver on the given #buf.
 		assert isInitialized();
 		Node currentNode = firstNode_;
 		do {
-			switch (currentNode.type_) {
-			case Node.NODE:
-				buf.append("Node ");
-				buf.append(currentNode.name_);
-				buf.append(" [Node]");
-				break;
-			case Node.WORKSTATION:
-				buf.append("Workstation ");
-				buf.append(currentNode.name_);
-				buf.append(" [Workstation]");
-				break;
-			case Node.PRINTER:
-				buf.append("Printer ");
-				buf.append(currentNode.name_);
-				buf.append(" [Printer]");
-				break;
-			default:
-				buf.append("(Unexpected)");;
-				break;
-			};
+			currentNode.printOn(buf, this);
 			buf.append(" -> ");
 			currentNode = currentNode.atDestination(this);
 		} while (currentNode != firstNode_);
@@ -326,26 +307,7 @@ Write a HTML representation of #receiver on the given #buf.
 		buf.append("\n\n<UL>");
 		do {
 			buf.append("\n\t<LI> ");
-			switch (currentNode.type_) {
-			case Node.NODE:
-				buf.append("Node ");
-				buf.append(currentNode.name_);
-				buf.append(" [Node]");
-				break;
-			case Node.WORKSTATION:
-				buf.append("Workstation ");
-				buf.append(currentNode.name_);
-				buf.append(" [Workstation]");
-				break;
-			case Node.PRINTER:
-				buf.append("Printer ");
-				buf.append(currentNode.name_);
-				buf.append(" [Printer]");
-				break;
-			default:
-				buf.append("(Unexpected)");;
-				break;
-			};
+			currentNode.printOn(buf, this);
 			buf.append(" </LI>");
 			currentNode = currentNode.atDestination(this);
 		} while (currentNode != firstNode_);
@@ -363,26 +325,7 @@ Write an XML representation of #receiver on the given #buf.
 		buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<network>");
 		do {
 			buf.append("\n\t");
-			switch (currentNode.type_) {
-			case Node.NODE:
-				buf.append("<node>");
-				buf.append(currentNode.name_);
-				buf.append("</node>");
-				break;
-			case Node.WORKSTATION:
-				buf.append("<workstation>");
-				buf.append(currentNode.name_);
-				buf.append("</workstation>");
-				break;
-			case Node.PRINTER:
-				buf.append("<printer>");
-				buf.append(currentNode.name_);
-				buf.append("</printer>");
-				break;
-			default:
-				buf.append("<unknown></unknown>");;
-				break;
-			};
+			currentNode.printXMLOn(buf, this);
 			currentNode = currentNode.atDestination(this);
 		} while (currentNode != firstNode_);
 		buf.append("\n</network>");
